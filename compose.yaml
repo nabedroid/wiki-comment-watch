@@ -1,0 +1,39 @@
+services:
+  ollama:
+    container_name: ollama
+    build:
+      context: ./ollama
+      dockerfile: Dockerfile
+      args:
+        - OLLAMA_MODEL=${OLLAMA_MODEL}
+    ports:
+      - "11434:11434"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  watcher:
+    container_name: watcher
+    build:
+      context: ./watcher
+      dockerfile: Dockerfile
+    volumes:
+      - ./watcher:/app
+    environment:
+      - OLLAMA_MODEL=${OLLAMA_MODEL}
+      - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+    
