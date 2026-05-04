@@ -76,7 +76,7 @@ if __name__ == '__main__':
   import locale
   locale.setlocale(locale.LC_TIME, 'ja_JP.UTF-8')
   ollama = OllamaService()
-  comment = Comment('UxwGBCa8ARM', '信者様乙ｗ', datetime.now())
+  comment = Comment('UxwGBCa8ARM', '信者様乙ｗ', 'コメント/雑談掲示板', datetime.now())
   print(ollama.post(comment))
-  comment = Comment('UxwGBCa8ARM', '正直、対抗戦とか対人戦をメインコンテンツにするんじゃなくて、塔の方をメインにして高難易度ダンジョンを臨機応変にビルドを組みながら攻略するってゲーム性の方が流行ってたと思うの・・・', datetime.now())
+  comment = Comment('UxwGBCa8ARM', '正直、対抗戦とか対人戦をメインコンテンツにするんじゃなくて、塔の方をメインにして高難易度ダンジョンを臨機応変にビルドを組みながら攻略するってゲーム性の方が流行ってたと思うの・・・', 'コメント/雑談掲示板', datetime.now())
   print(ollama.post(comment))
