@@ -5,7 +5,8 @@ services:
       context: ./ollama
       dockerfile: Dockerfile
       args:
-        - OLLAMA_MODEL=${OLLAMA_MODEL}
+        - BASE_MODEL=${BASE_MODEL}
+        - CUSTOM_MODEL=${CUSTOM_MODEL}
     ports:
       - "11434:11434"
     deploy:
@@ -30,7 +31,7 @@ services:
     volumes:
       - ./watcher:/app
     environment:
-      - OLLAMA_MODEL=${OLLAMA_MODEL}
+      - CUSTOM_MODEL=${CUSTOM_MODEL}
       - DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
     depends_on:
       ollama:

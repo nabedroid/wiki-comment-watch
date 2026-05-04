@@ -10,8 +10,8 @@ RUN apt-get update && apt-get install -y \
 ENV LANG ja_JP.UTF-8
 ENV LC_ALL ja_JP.UTF-8
 
-#  Pythonライブラリのインストール
-RUN pip install --no-cache-dir --upgrade pip beautifulsoup4 requests
+# ライブラリのインストール
+RUN pip install --no-cache-dir --upgrade pip beautifulsoup4 requests ollama
 
 WORKDIR /app
 

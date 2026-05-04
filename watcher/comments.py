@@ -5,12 +5,13 @@ from datetime import datetime
 DB_NAME = 'comments.db'
 
 class Comment:
-  def __init__(self, date_userid: str, comment: str, posted_at: datetime) -> None:
-    seed = f'{date_userid}:{comment}:{posted_at.isoformat()}'
+  def __init__(self, date_userid: str, comment: str, page: str, posted_at: datetime) -> None:
+    seed = f'{date_userid}:{comment}:{page}:{posted_at.isoformat()}'
     # 流動量の少ない掲示板なら16文字でも衝突しないと判断
     self._id = hashlib.sha256(seed.encode()).hexdigest()[:16]
     self._date_userid = date_userid
     self._comment = comment
+    self._page = page
     self._posted_at = posted_at
   
   def __str__(self) -> str:
@@ -24,6 +25,9 @@ class Comment:
   
   @property
   def comment(self) -> str: return self._comment
+  
+  @property
+  def page(self) -> str: return self._page
   
   @property
   def posted_at(self) -> datetime: return self._posted_at
@@ -40,6 +44,7 @@ class Comments:
           id TEXT PRIMARY KEY,
           date_userid TEXT,
           comment TEXT,
+          page TEXT,
           posted_at TIMESTAMP,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
@@ -49,9 +54,9 @@ class Comments:
   def insert(self, comment: Comment) -> None:
     with sqlite3.connect(self._db_name) as conn:
       conn.execute('''
-        INSERT INTO processed_comments (id, date_userid, comment, posted_at)
-        VALUES (?, ?, ?, ?)
-      ''', (comment.id, comment.date_userid, comment.comment, comment.posted_at.isoformat()))
+        INSERT INTO processed_comments (id, date_userid, comment, page, posted_at)
+        VALUES (?, ?, ?, ?, ?)
+      ''', (comment.id, comment.date_userid, comment.comment, comment.page, comment.posted_at.isoformat()))
       conn.commit()
 
   def exists(self, comment: Comment) -> bool:
@@ -78,19 +83,19 @@ class Comments:
   def select(self, id: str) -> Comment | None:
     with sqlite3.connect(self._db_name) as conn:
       cursor = conn.execute('''
-        SELECT date_userid, comment, posted_at FROM processed_comments WHERE id = ?
+        SELECT date_userid, comment, page, posted_at FROM processed_comments WHERE id = ?
       ''', (id,))
       row = cursor.fetchone()
       if row is None:
         return None
-      return Comment(row[0], row[1], datetime.fromisoformat(row[2]))
+      return Comment(row[0], row[1], row[2], datetime.fromisoformat(row[3]))
 
   def select_all(self, limit: int = 100) -> list[Comment]:
     with sqlite3.connect(self._db_name) as conn:
       cursor = conn.execute('''
-        SELECT id, date_userid, comment, posted_at FROM processed_comments ORDER BY posted_at DESC LIMIT ?
+        SELECT id, date_userid, comment, page, posted_at FROM processed_comments ORDER BY posted_at DESC LIMIT ?
       ''', (limit,))
-      return [Comment(row[1], row[2], datetime.fromisoformat(row[3])) for row in cursor.fetchall()]
+      return [Comment(row[1], row[2], row[3], datetime.fromisoformat(row[4])) for row in cursor.fetchall()]
 
   def count(self) -> int:
     with sqlite3.connect(self._db_name) as conn:
@@ -101,7 +106,7 @@ class Comments:
 
 if __name__ == '__main__':
   # テストコード
-  comment = Comment('test', 'test', datetime.now())
+  comment = Comment('test', 'test', 'test', datetime.now())
   db = Comments()
   db.init_db()
   count = db.count()

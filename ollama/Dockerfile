@@ -5,11 +5,14 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-ARG OLLAMA_MODEL
-ENV OLLAMA_MODEL=${OLLAMA_MODEL}
+ARG BASE_MODEL
+ARG CUSTOM_MODEL
+ENV BASE_MODEL=${BASE_MODEL}
+ENV CUSTOM_MODEL=${CUSTOM_MODEL}
 
 # スクリプトをコピーして実行権限を与える
 COPY entrypoint.sh entrypoint.sh
+COPY Modelfile Modelfile
 RUN chmod +x entrypoint.sh
 
 # ポート開放

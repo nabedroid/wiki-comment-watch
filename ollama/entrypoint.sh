@@ -9,9 +9,14 @@ while ! curl -s http://localhost:11435/api/tags > /dev/null; do
     sleep 1
 done
 
-# モデルのダウンロード
-echo "Pulling ${OLLAMA_MODEL} model..."
-OLLAMA_HOST=127.0.0.1:11435 ollama pull ${OLLAMA_MODEL}
+# モデルの作成
+echo "Creating ${CUSTOM_MODEL} model..."
+## 環境変数を埋め込んだModelfileを作成
+sed "s/\${BASE_MODEL}/${BASE_MODEL}/g" Modelfile > Modelfile.tmp
+## カスタムモデルを作成
+OLLAMA_HOST=127.0.0.1:11435 ollama create ${CUSTOM_MODEL} -f Modelfile.tmp
+## 一時ファイルを削除
+rm Modelfile.tmp
 
 # 正規のポートで再起動
 pkill ollama
